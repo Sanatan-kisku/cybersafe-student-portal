@@ -9,6 +9,7 @@ import Dashboard from "./pages/Dashboard";
 import Courses from "./pages/Courses";
 import About from "./pages/About";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import Quiz from "./pages/Quiz";
 
 
 export default function App() {
@@ -30,6 +31,10 @@ export default function App() {
           <Route
             path="/dashboard"
             element={<Dashboard />}
+          />
+          <Route
+            path="/quiz"
+            element={<Quiz />}
           />
 
         </Route>
