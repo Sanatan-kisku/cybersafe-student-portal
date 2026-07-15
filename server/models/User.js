@@ -21,6 +21,30 @@ const userSchema = new mongoose.Schema(
       required: [true, "Password is required"],
       minlength: 6,
     },
+    quiz: {
+      score: {
+        type: Number,
+        default: 0,
+      },
+
+      total: {
+        type: Number,
+        default: 0,
+      },
+
+      percentage: {
+        type: Number,
+        default: 0,
+      },
+
+      passed: {
+        type: Boolean,
+        default: false,
+      },
+      completedAt: {
+        type: Date,
+      },
+    },
   },
   {
     timestamps: true,

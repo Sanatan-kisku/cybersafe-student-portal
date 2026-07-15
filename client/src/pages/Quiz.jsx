@@ -1,6 +1,7 @@
 import { useState } from "react";
 import questions from "../data/questions";
 import useQuiz from "../hooks/useQuiz";
+import { submitQuiz } from "../services/quizService";
 
 export default function Quiz() {
   const [current, setCurrent] = useState(0);
@@ -9,7 +10,7 @@ export default function Quiz() {
 
   const { setQuizResult } = useQuiz();
 
-  const handleAnswer = (option) => {
+  const handleAnswer = async (option) => {
     const isCorrect = option === questions[current].answer;
     const newScore = isCorrect ? score + 1 : score;
 
@@ -23,12 +24,24 @@ export default function Quiz() {
 
       const passed = percentage >= 70;
 
-      setQuizResult({
+      const result = {
         score: newScore,
         total: questions.length,
         percentage,
         passed,
-      });
+      };
+
+      try {
+
+        await submitQuiz(result);
+
+        setQuizResult(result);
+
+      } catch (error) {
+
+        console.error(error);
+
+      }
 
       setScore(newScore);
       setFinished(true);
