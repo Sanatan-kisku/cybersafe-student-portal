@@ -1,43 +1,45 @@
+import { Link } from "react-router-dom";
+
 export default function Hero() {
-
   return (
+    <section className="bg-linear-to-r from-blue-700 to-indigo-700 text-white">
 
-    <section className="bg-linear-to-r from-blue-700 to-cyan-500 text-white py-20">
+      <div className="container mx-auto px-6 py-24">
 
-      <div className="container text-center">
+        <div className="max-w-3xl">
 
+          <h1 className="text-5xl font-bold leading-tight">
+            CyberSafe Student Portal
+          </h1>
 
-        <h1 className="text-5xl font-bold">
+          <p className="mt-6 text-xl text-blue-100">
+            Learn cyber safety through interactive courses,
+            games, quizzes, and earn certificates while
+            protecting yourself online.
+          </p>
 
-          CyberSafe Student Portal
+          <div className="mt-8 flex gap-4 flex-wrap">
 
-        </h1>
+            <Link
+              to="/register"
+              className="bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition"
+            >
+              Get Started
+            </Link>
 
+            <Link
+              to="/courses"
+              className="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-blue-700 transition"
+            >
+              Explore Courses
+            </Link>
 
-        <p className="mt-5 text-xl">
-
-          Learn Cyber Security through interactive courses and games.
-
-        </p>
-
-
-        <div className="mt-8">
-
-          <a
-            href="/register"
-            className="bg-white text-blue-700 px-6 py-3 rounded-lg"
-          >
-            Start Learning
-          </a>
-
+          </div>
 
         </div>
-
 
       </div>
 
     </section>
-
-  )
-
+  );
 }
