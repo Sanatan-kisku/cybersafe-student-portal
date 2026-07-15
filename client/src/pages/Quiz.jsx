@@ -1,29 +1,64 @@
 import { useState } from "react";
 import questions from "../data/questions";
+import useQuiz from "../hooks/useQuiz";
 
 export default function Quiz() {
   const [current, setCurrent] = useState(0);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
+  const { setQuizResult } = useQuiz();
+
   const handleAnswer = (option) => {
-    if (option === questions[current].answer) {
-      setScore((prev) => prev + 1);
-    }
+    const isCorrect = option === questions[current].answer;
+    const newScore = isCorrect ? score + 1 : score;
 
     if (current + 1 < questions.length) {
+      setScore(newScore);
       setCurrent((prev) => prev + 1);
     } else {
+      const percentage = Math.round(
+        (newScore / questions.length) * 100
+      );
+
+      const passed = percentage >= 70;
+
+      setQuizResult({
+        score: newScore,
+        total: questions.length,
+        percentage,
+        passed,
+      });
+
+      setScore(newScore);
       setFinished(true);
     }
   };
 
+  const handleRetake = () => {
+    setCurrent(0);
+    setScore(0);
+    setFinished(false);
+
+    setQuizResult({
+      score: 0,
+      total: 0,
+      percentage: 0,
+      passed: false,
+    });
+  };
+
   if (finished) {
-    const percentage = Math.round((score / questions.length) * 100);
+    const percentage = Math.round(
+      (score / questions.length) * 100
+    );
 
     return (
       <div className="max-w-xl mx-auto mt-10 bg-white shadow rounded-lg p-6 text-center">
-        <h1 className="text-3xl font-bold">Quiz Completed 🎉</h1>
+
+        <h1 className="text-3xl font-bold">
+          Quiz Completed 🎉
+        </h1>
 
         <p className="mt-4 text-xl">
           Score: {score} / {questions.length}
@@ -38,6 +73,14 @@ export default function Quiz() {
             ? "✅ Congratulations! You Passed."
             : "❌ You did not pass. Try again."}
         </p>
+
+        <button
+          onClick={handleRetake}
+          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+        >
+          Retake Quiz
+        </button>
+
       </div>
     );
   }
@@ -60,7 +103,7 @@ export default function Quiz() {
           <button
             key={option}
             onClick={() => handleAnswer(option)}
-            className="w-full border rounded-lg p-3 hover:bg-blue-100"
+            className="w-full border rounded-lg p-3 hover:bg-blue-100 transition"
           >
             {option}
           </button>

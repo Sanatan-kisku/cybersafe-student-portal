@@ -1,43 +1,88 @@
+import { Link } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import useQuiz from "../hooks/useQuiz";
+
 import PasswordChecker from "../components/games/PasswordChecker";
 import LinkChecker from "../components/games/LinkChecker";
-import { Link } from "react-router-dom";
-
 
 export default function Dashboard() {
-
   const { user } = useAuth();
-
+  const { quizResult } = useQuiz();
 
   return (
+    <div className="container mx-auto py-10 px-4">
 
-    <div className="container py-10">
+      {/* Welcome Section */}
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <h1 className="text-3xl font-bold text-blue-700">
+          Welcome, {user?.name} 👋
+        </h1>
 
+        <p className="mt-2 text-gray-600">
+          Continue your Cyber Safety learning journey.
+        </p>
+      </div>
 
-      <h1 className="text-3xl font-bold">
+      {/* Quiz Status */}
+      <div className="bg-white shadow rounded-lg p-6 mb-6">
+        <h2 className="text-2xl font-bold mb-4">
+          📝 Quiz Status
+        </h2>
 
-        Welcome {user?.name}
+        <p>
+          <strong>Score:</strong>{" "}
+          {quizResult.score}/{quizResult.total}
+        </p>
 
-      </h1>
+        <p>
+          <strong>Percentage:</strong>{" "}
+          {quizResult.percentage}%
+        </p>
 
+        <p className="mt-2 text-lg font-semibold">
+          {quizResult.passed ? (
+            <span className="text-green-600">
+              ✅ Passed
+            </span>
+          ) : (
+            <span className="text-red-600">
+              ❌ Not Passed Yet
+            </span>
+          )}
+        </p>
+      </div>
 
-      <p className="mt-3">
+      {/* Action Buttons */}
+      <div className="grid md:grid-cols-2 gap-4 mb-8">
 
-        Continue your cyber safety learning journey.
+        <Link
+          to="/quiz"
+          className="bg-blue-600 hover:bg-blue-700 text-white text-center p-5 rounded-lg font-semibold transition"
+        >
+          📝 Take Cyber Safety Quiz
+        </Link>
 
-      </p>
-      <Link
-        to="/quiz"
-        className="block bg-blue-600 text-white p-5 rounded-lg mt-6 text-center hover:bg-blue-700"
-      >
-        📝 Take Cyber Safety Quiz
-      </Link>
+        {quizResult.passed ? (
+          <Link
+            to="/certificate"
+            className="bg-green-600 hover:bg-green-700 text-white text-center p-5 rounded-lg font-semibold transition"
+          >
+            🎓 Download Certificate
+          </Link>
+        ) : (
+          <div className="bg-gray-200 text-gray-700 text-center p-5 rounded-lg font-semibold">
+            🔒 Pass the Quiz to Unlock Certificate
+          </div>
+        )}
 
-      <PasswordChecker />
-      <LinkChecker />
+      </div>
+
+      {/* Cyber Games */}
+      <div className="space-y-8">
+        <PasswordChecker />
+        <LinkChecker />
+      </div>
 
     </div>
-
-  )
-
+  );
 }

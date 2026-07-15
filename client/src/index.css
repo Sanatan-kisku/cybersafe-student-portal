@@ -10,3 +10,13 @@ body {
   max-width: 1200px;
   margin: auto;
 }
+
+@media print {
+  button {
+    display: none;
+  }
+
+  body {
+    background: white;
+  }
+}
