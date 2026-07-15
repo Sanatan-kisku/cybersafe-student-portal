@@ -1,5 +1,6 @@
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 
 export default function Login() {
@@ -83,6 +84,15 @@ export default function Login() {
           onChange={handleChange}
           className="border p-2 w-full mb-3"
         />
+
+        <div className="text-right mb-4">
+          <Link
+            to="/forgot-password"
+            className="text-blue-600 hover:underline"
+          >
+            Forgot Password?
+          </Link>
+        </div>
 
 
         <button

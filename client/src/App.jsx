@@ -11,6 +11,8 @@ import About from "./pages/About";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Quiz from "./pages/Quiz";
 import Certificate from "./pages/Certificate";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 
 export default function App() {
@@ -26,6 +28,16 @@ export default function App() {
         <Route path="/login" element={<Login />} />
 
         <Route path="/register" element={<Register />} />
+
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        <Route
+          path="/reset-password/:token"
+          element={<ResetPassword />}
+        />
 
         <Route element={<ProtectedRoute />}>
 

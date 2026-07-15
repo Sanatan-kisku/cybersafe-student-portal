@@ -1,5 +1,8 @@
-import express from "express";
 import dotenv from "dotenv";
+
+dotenv.config();
+// console.log("Loaded EMAIL_USER:", process.env.EMAIL_USER);
+import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import errorHandler from "./middleware/error.middleware.js";
@@ -9,7 +12,6 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/auth.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 
-dotenv.config();
 
 // Connect to MongoDB
 connectDB();
