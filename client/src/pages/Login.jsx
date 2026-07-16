@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import { Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 
 export default function Login() {
@@ -13,6 +14,7 @@ export default function Login() {
     password: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
 
   const [error, setError] = useState("");
 
@@ -23,7 +25,7 @@ export default function Login() {
       ...formData,
       [e.target.name]: e.target.value,
     });
-
+    setError("");
   };
 
 
@@ -76,14 +78,28 @@ export default function Login() {
         />
 
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border p-2 w-full mb-3"
-        />
+        <div className="relative mb-3">
+          <input
+            name="password"
+            type={showPassword ? "text" : "password"}
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="border p-2 w-full pr-10 rounded"
+          />
+
+          <button
+            type="button"
+            onClick={() => setShowPassword((prev) => !prev)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600 cursor-pointer"
+          >
+            {showPassword ? (
+              <FaEyeSlash size={18} />
+            ) : (
+              <FaEye size={18} />
+            )}
+          </button>
+        </div>
 
         <div className="text-right mb-4">
           <Link
@@ -96,7 +112,9 @@ export default function Login() {
 
 
         <button
-          className="bg-blue-600 text-white w-full p-2 rounded"
+          type="submit"
+          disabled={!formData.email || !formData.password}
+          className="bg-blue-600 text-white w-full p-2 rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
         >
           Login
         </button>

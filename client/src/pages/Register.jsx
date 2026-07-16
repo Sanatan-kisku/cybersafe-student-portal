@@ -1,48 +1,71 @@
 import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useAuth from "../hooks/useAuth";
 
 export default function Register() {
 
   const { register } = useAuth();
 
-
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: ""
-  });
-
+  const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState("");
 
 
   const handleChange = (e) => {
-
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
-
   };
 
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
+    setError("");
 
-    const result = await register(
-      formData.name,
-      formData.email,
-      formData.password
-    );
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-
-    if (!result.success) {
-      setError(result.message);
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      return;
     }
 
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    try {
+      setLoading(true);
+
+      const result = await register(
+        formData.name.trim(),
+        formData.email.trim().toLowerCase(),
+        formData.password
+      );
+
+      if (!result.success) {
+        setError(result.message);
+      }
+
+    } catch (error) {
+      setError("Something went wrong.");
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
 
 
   return (
@@ -71,7 +94,8 @@ export default function Register() {
           placeholder="Name"
           value={formData.name}
           onChange={handleChange}
-          className="border p-2 w-full mb-3"
+          className="mb-3 w-full border rounded-lg p-3"
+          required
         />
 
 
@@ -81,24 +105,82 @@ export default function Register() {
           placeholder="Email"
           value={formData.email}
           onChange={handleChange}
-          className="border p-2 w-full mb-3"
+          className="mb-3 w-full border rounded-lg p-3"
+          required
         />
 
 
-        <input
-          name="password"
-          type="password"
-          placeholder="Password"
-          value={formData.password}
-          onChange={handleChange}
-          className="border p-2 w-full mb-3"
-        />
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? "text" : "password"}
+            name="password"
+            minLength={8}
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3"
+            required
+          />
+
+          <button
+            type="button"
+            className="absolute right-3 top-3"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+
+        <div className="relative mb-4">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            name="confirmPassword"
+            placeholder="Confirm Password"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            className="w-full border rounded-lg p-3"
+            required
+          />
+
+          <button
+            type="button"
+            className="absolute right-3 top-3"
+            onClick={() =>
+              setShowConfirmPassword(!showConfirmPassword)
+            }
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+        {formData.confirmPassword && (
+          <p
+            className={`mt-2 text-sm font-medium ${formData.password === formData.confirmPassword
+              ? "text-green-600"
+              : "text-red-600"
+              }`}
+          >
+            {formData.password === formData.confirmPassword
+              ? "✅ Passwords match"
+              : "❌ Passwords do not match"}
+          </p>
+        )}
+
+
 
 
         <button
-          className="bg-blue-600 text-white w-full p-2 rounded"
+          type="submit"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+          disabled={
+            loading ||
+            !formData.name.trim() ||
+            !formData.email.trim() ||
+            !formData.password ||
+            !formData.confirmPassword ||
+            formData.password !== formData.confirmPassword
+          }
         >
-          Register
+          {loading ? "Creating Account..." : "Register"}
         </button>
 
 

@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import sendEmail from "../utils/sendEmail.js";
 // import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import validator from "validator";
 
 export const register = async (req, res) => {
   try {
@@ -16,7 +17,23 @@ export const register = async (req, res) => {
       });
     }
 
-    // Check if user already exists
+    // Validate email
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address.",
+      });
+    }
+
+    // Validate password
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 8 characters.",
+      });
+    }
+
+    // Check existing user
     const existingUser = await User.findOne({
       email: email.toLowerCase(),
     });
@@ -24,12 +41,9 @@ export const register = async (req, res) => {
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: "User already exists",
+        message: "Email already registered.",
       });
     }
-
-    // Hash password
-    // const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
     const user = await User.create({
@@ -40,13 +54,9 @@ export const register = async (req, res) => {
 
     // Generate JWT
     const token = jwt.sign(
-      {
-        id: user._id,
-      },
+      { id: user._id },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: "7d" }
     );
 
     // Save token in cookie
@@ -69,6 +79,7 @@ export const register = async (req, res) => {
         email: user.email,
       },
     });
+
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -188,8 +199,9 @@ export const forgotPassword = async (req, res) => {
     }
 
     // Find user
-    const user = await User.findOne({ email }).select("+password");
-
+    const user = await User.findOne({
+      email: email.toLowerCase(),
+    });
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -297,7 +309,7 @@ export const resetPassword = async (req, res) => {
         message: "Invalid or expired reset token",
       });
     }
-    if (password.length < 6) {
+    if (password.length < 8) {
       return res.status(400).json({
         success: false,
         message: "Password must be at least 6 characters long",

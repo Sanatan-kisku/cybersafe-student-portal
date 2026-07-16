@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { resetPassword } from "../services/authService";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function ResetPassword() {
   const { token } = useParams();
@@ -13,16 +14,25 @@ export default function ResetPassword() {
 
   const [loading, setLoading] = useState(false);
 
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      setMessage("Passwords do not match.");
+      return;
+    }
 
     try {
       setLoading(true);
 
-      const data = await resetPassword(
-        token,
-        password
-      );
+      const data = await resetPassword(token, password);
 
       setMessage(data.message);
 
@@ -40,6 +50,8 @@ export default function ResetPassword() {
     }
   };
 
+
+
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-100">
 
@@ -52,24 +64,75 @@ export default function ResetPassword() {
           Reset Password
         </h1>
 
-        <input
-          type="password"
-          placeholder="New Password"
-          className="border rounded-lg p-3 w-full mb-4"
-          value={password}
-          onChange={(e) =>
-            setPassword(e.target.value)
-          }
-          required
-        />
+        <div className="relative mb-4">
+          <input
+            type={showPassword ? "text" : "password"}
+            placeholder="New Password"
+            value={password}
+            onChange={(e) => {
+              setPassword(e.target.value);
+              setMessage("");
+            }}
+            className="border rounded-lg p-3 w-full"
+            required
+          />
+
+          <button
+            type="button"
+            className="absolute right-3 top-3"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+
+        <div className="relative mb-4">
+          <input
+            type={showConfirmPassword ? "text" : "password"}
+            placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => {
+              setConfirmPassword(e.target.value);
+              setMessage("");
+            }}
+            className="border rounded-lg p-3 w-full"
+            required
+          />
+
+          <button
+            type="button"
+            className="absolute right-3 top-3"
+            onClick={() =>
+              setShowConfirmPassword(!showConfirmPassword)
+            }
+          >
+            {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+          </button>
+        </div>
+        {confirmPassword && (
+          <p
+            className={`mt-2 text-sm ${password === confirmPassword
+              ? "text-green-600"
+              : "text-red-600"
+              }`}
+          >
+            {password === confirmPassword
+              ? "✅ Passwords match"
+              : "❌ Passwords do not match"}
+          </p>
+        )}
 
         <button
-          className="bg-green-600 text-white w-full py-3 rounded-lg hover:bg-green-700"
-          disabled={loading}
+          type="submit"
+          className="bg-green-600 text-white w-full py-3 rounded-lg hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+          disabled={
+            loading ||
+            !password ||
+            !confirmPassword ||
+            password !== confirmPassword
+          }
         >
-          {loading
-            ? "Saving..."
-            : "Reset Password"}
+          {loading ? "Saving..." : "Reset Password"}
         </button>
 
         {message && (

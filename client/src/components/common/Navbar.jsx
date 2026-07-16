@@ -51,6 +51,7 @@ export default function Navbar() {
 
                 <button
                   onClick={logout}
+                  className="hover:text-white text-yellow-400 rounded-lg cursor-pointer transition"
                 >
                   Logout
                 </button>
