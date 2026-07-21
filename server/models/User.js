@@ -58,6 +58,35 @@ const userSchema = new mongoose.Schema(
         type: Date,
       },
     },
+    avatar: {
+      type: String,
+      default: "",
+    },
+
+    xp: {
+      type: Number,
+      default: 0,
+    },
+
+    gamesPlayed: {
+      type: Number,
+      default: 0,
+    },
+
+    coursesCompleted: {
+      type: Number,
+      default: 0,
+    },
+
+    certificates: {
+      type: Number,
+      default: 0,
+    },
+
+    rank: {
+      type: String,
+      default: "Beginner",
+    },
   },
   {
     timestamps: true,

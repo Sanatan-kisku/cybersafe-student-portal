@@ -4,6 +4,12 @@ export default function QuizStatusCard() {
 
   const { quizResult } = useQuiz();
 
+  const savedQuiz = JSON.parse(
+    sessionStorage.getItem("quizState") || "{}"
+  );
+
+  const result = savedQuiz.result || quizResult;
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
 
@@ -14,13 +20,13 @@ export default function QuizStatusCard() {
       <p>
         Score:
         {" "}
-        {quizResult.score}/{quizResult.total}
+        {result.score}/{result.total}
       </p>
 
       <p className="mt-2">
         Percentage:
         {" "}
-        {quizResult.percentage}%
+        {result.percentage}%
       </p>
 
       <div className="w-full bg-gray-200 rounded-full h-3 mt-5">
@@ -28,7 +34,7 @@ export default function QuizStatusCard() {
         <div
           className="bg-green-500 h-3 rounded-full"
           style={{
-            width: `${quizResult.percentage}%`,
+            width: `${result.percentage}%`,
           }}
         />
 
@@ -36,7 +42,7 @@ export default function QuizStatusCard() {
 
       <p className="mt-5 font-semibold">
 
-        {quizResult.passed
+        {result.passed
           ? "✅ Passed"
           : "❌ Not Passed"}
 

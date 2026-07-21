@@ -13,6 +13,8 @@ import Quiz from "./pages/Quiz";
 import Certificate from "./pages/Certificate";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import CoursePlayer from "./pages/CoursePlayer";
 
 
 export default function App() {
@@ -46,12 +48,20 @@ export default function App() {
             element={<Dashboard />}
           />
           <Route
+            path="/courses/:id"
+            element={<CoursePlayer />}
+          />
+          <Route
             path="/quiz"
             element={<Quiz />}
           />
           <Route
             path="/certificate"
             element={<Certificate />}
+          />
+          <Route
+            path="/profile"
+            element={<Profile />}
           />
 
         </Route>

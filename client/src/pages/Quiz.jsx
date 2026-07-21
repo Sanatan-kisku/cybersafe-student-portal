@@ -1,14 +1,46 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import questions from "../data/questions";
 import useQuiz from "../hooks/useQuiz";
 import { submitQuiz } from "../services/quizService";
 
 export default function Quiz() {
-  const [current, setCurrent] = useState(0);
-  const [score, setScore] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const navigate = useNavigate();
 
   const { setQuizResult } = useQuiz();
+
+  // Restore quiz state from sessionStorage
+  const [savedState] = useState(() => {
+    return JSON.parse(
+      sessionStorage.getItem("quizState") || "{}"
+    );
+  });
+
+  const [current, setCurrent] = useState(savedState.current ?? 0);
+  const [score, setScore] = useState(savedState.score ?? 0);
+  const [finished, setFinished] = useState(savedState.finished ?? false);
+
+  const [result, setResult] = useState(
+    savedState.result ?? {
+      score: 0,
+      total: 0,
+      percentage: 0,
+      passed: false,
+    }
+  );
+
+  // Save state whenever it changes
+  useEffect(() => {
+    sessionStorage.setItem(
+      "quizState",
+      JSON.stringify({
+        current,
+        score,
+        finished,
+        result,
+      })
+    );
+  }, [current, score, finished, result]);
 
   const handleAnswer = async (option) => {
     const isCorrect = option === questions[current].answer;
@@ -32,68 +64,97 @@ export default function Quiz() {
       };
 
       try {
-
         await submitQuiz(result);
-
         setQuizResult(result);
-
       } catch (error) {
-
         console.error(error);
-
       }
 
+      setResult(result);
+      sessionStorage.setItem(
+        "quizState",
+        JSON.stringify({
+          current: questions.length - 1,
+          score: newScore,
+          finished: true,
+          result,
+        })
+      );
       setScore(newScore);
       setFinished(true);
     }
   };
 
   const handleRetake = () => {
+    sessionStorage.removeItem("quizState");
+
     setCurrent(0);
     setScore(0);
     setFinished(false);
 
-    setQuizResult({
+    const emptyResult = {
       score: 0,
       total: 0,
       percentage: 0,
       passed: false,
-    });
+    };
+
+    setResult(emptyResult);
+    setQuizResult(emptyResult);
   };
 
   if (finished) {
-    const percentage = Math.round(
-      (score / questions.length) * 100
-    );
-
     return (
-      <div className="max-w-xl mx-auto mt-10 bg-white shadow rounded-lg p-6 text-center">
+      <div className="max-w-xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-8 text-center">
+        <h2 className="text-3xl font-bold text-green-600 mb-4">
+          🎉 Quiz Completed!
+        </h2>
 
-        <h1 className="text-3xl font-bold">
-          Quiz Completed 🎉
-        </h1>
-
-        <p className="mt-4 text-xl">
-          Score: {score} / {questions.length}
+        <p className="text-xl mb-2">
+          <strong>Score:</strong> {result.score} / {result.total}
         </p>
 
-        <p className="mt-2 text-lg">
-          Percentage: {percentage}%
+        <p className="text-lg mb-4">
+          <strong>Percentage:</strong> {result.percentage}%
         </p>
 
-        <p className="mt-4 font-semibold">
-          {percentage >= 70
-            ? "✅ Congratulations! You Passed."
-            : "❌ You did not pass. Try again."}
-        </p>
-
-        <button
-          onClick={handleRetake}
-          className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+        <p
+          className={`text-lg font-semibold mb-6 ${result.passed
+            ? "text-green-600"
+            : "text-red-600"
+            }`}
         >
-          Retake Quiz
-        </button>
+          {result.passed
+            ? "✅ Congratulations! You passed the quiz."
+            : "❌ You did not pass. Try again!"}
+        </p>
 
+        <div className="flex flex-wrap justify-center gap-4">
+
+          <button
+            onClick={handleRetake}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition"
+          >
+            🔄 Retake Quiz
+          </button>
+
+          {result.passed && (
+            <button
+              onClick={() => navigate("/certificate")}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition"
+            >
+              🏆 Download Certificate
+            </button>
+          )}
+
+          <button
+            onClick={() => navigate("/dashboard")}
+            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-3 rounded-lg transition"
+          >
+            📊 Go to Dashboard
+          </button>
+
+        </div>
       </div>
     );
   }
@@ -101,13 +162,24 @@ export default function Quiz() {
   const question = questions[current];
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white shadow rounded-lg p-6">
+    <div className="max-w-xl mx-auto mt-10 bg-white shadow-lg rounded-lg p-6">
 
-      <h2 className="text-xl font-semibold">
+      <h2 className="text-xl font-semibold mb-2">
         Question {current + 1} of {questions.length}
       </h2>
 
-      <h3 className="text-2xl mt-4 mb-6">
+      {/* Progress Bar */}
+      <div className="w-full bg-gray-200 rounded-full h-3 mb-6">
+        <div
+          className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+          style={{
+            width: `${((current + 1) / questions.length) * 100
+              }%`,
+          }}
+        />
+      </div>
+
+      <h3 className="text-2xl font-semibold mb-6">
         {question.question}
       </h3>
 
@@ -116,7 +188,7 @@ export default function Quiz() {
           <button
             key={option}
             onClick={() => handleAnswer(option)}
-            className="w-full border rounded-lg p-3 hover:bg-blue-100 transition"
+            className="w-full border border-gray-300 rounded-lg p-3 text-left hover:bg-blue-100 hover:border-blue-500 transition"
           >
             {option}
           </button>

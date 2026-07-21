@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import profileRoutes from "./routes/profile.routes.js";
 
 dotenv.config();
 // console.log("Loaded EMAIL_USER:", process.env.EMAIL_USER);
@@ -64,3 +65,4 @@ app.listen(PORT, () => {
 });
 
 app.use(errorHandler);
+app.use("/api/profile", profileRoutes);

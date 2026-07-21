@@ -3,6 +3,11 @@ import StatsCard from "../components/dashboard/StatsCard";
 import ProfileCard from "../components/dashboard/ProfileCard";
 import QuizStatusCard from "../components/dashboard/QuizStatusCard";
 import QuickActions from "../components/dashboard/QuickActions";
+import XPCard from "../components/dashboard/XPCard";
+import BadgeCollection from "../components/dashboard/BadgeCollection";
+import CourseProgressCard from "../components/dashboard/CourseProgressCard";
+import ContinueLearning from "../components/dashboard/ContinueLearning";
+import LearningStreak from "../components/dashboard/LearningStreak";
 
 import PasswordChecker from "../components/games/PasswordChecker";
 import LinkChecker from "../components/games/LinkChecker";
@@ -11,6 +16,12 @@ import useQuiz from "../hooks/useQuiz";
 
 export default function Dashboard() {
   const { quizResult, loading } = useQuiz();
+
+  const savedQuiz = JSON.parse(
+    sessionStorage.getItem("quizState") || "{}"
+  );
+
+  const result = savedQuiz.result || quizResult;
 
   if (loading) {
     return (
@@ -27,6 +38,28 @@ export default function Dashboard() {
 
       {/* Welcome */}
       <WelcomeCard />
+
+      <div className="
+grid
+md:grid-cols-2
+lg:grid-cols-4
+gap-6
+">
+
+
+        <XPCard />
+
+        <LearningStreak />
+
+        <CourseProgressCard />
+
+        <ContinueLearning />
+
+
+      </div>
+
+
+      <BadgeCollection />
 
       {/* Statistics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
@@ -45,14 +78,14 @@ export default function Dashboard() {
 
         <StatsCard
           title="Quiz"
-          value={quizResult.passed ? "Passed" : "Pending"}
-          color={quizResult.passed ? "bg-green-600" : "bg-yellow-500"}
+          value={result.passed ? "Passed" : "Pending"}
+          color={result.passed ? "bg-green-600" : "bg-yellow-500"}
         />
 
         <StatsCard
           title="Certificate"
-          value={quizResult.passed ? "Unlocked" : "Locked"}
-          color={quizResult.passed ? "bg-emerald-600" : "bg-red-500"}
+          value={result.passed ? "Unlocked" : "Locked"}
+          color={result.passed ? "bg-emerald-600" : "bg-red-500"}
         />
 
       </div>

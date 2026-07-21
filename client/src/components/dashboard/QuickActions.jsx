@@ -5,6 +5,12 @@ export default function QuickActions() {
 
   const { quizResult } = useQuiz();
 
+  const savedQuiz = JSON.parse(
+    sessionStorage.getItem("quizState") || "{}"
+  );
+
+  const result = savedQuiz.result || quizResult;
+
   return (
     <div className="bg-white rounded-xl shadow-md p-6">
 
@@ -35,7 +41,14 @@ export default function QuickActions() {
           ℹ About
         </Link>
 
-        {quizResult.passed ? (
+        <Link
+          to="/profile"
+          className="bg-purple-600 hover:bg-purple-700 text-white text-center p-5 rounded-xl font-semibold transition duration-300"
+        >
+          👤 My Profile
+        </Link>
+
+        {result.passed ? (
           <Link
             to="/certificate"
             className="bg-green-600 text-white rounded-lg p-4 text-center"
